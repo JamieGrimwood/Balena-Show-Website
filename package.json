@@ -9,6 +9,9 @@
   "scripts": {
     "start": "./node_modules/.bin/electron main.js"
   },
+  "engines": {
+    "node": "~14"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JamieGrimwood/Balena-Show-Website.git"
