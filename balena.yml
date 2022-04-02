@@ -1,0 +1,24 @@
+name: balena-show-website
+type: sw.application
+joinable: false
+version: 1.1.0
+description: >-
+  A simple way to display any website on a screen.
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: 'https://github.com/JamieGrimwood/Balena-Show-Website'
+data:
+  applicationConfigVariables:
+    - RESIN_HOST_CONFIG_gpu_mem: 128
+  applicationEnvironmentVariables:
+    - WEBSITE_URL: https://status.colournodes.com
+  defaultDeviceType: "raspberrypi4-64"
+  supportedDeviceTypes:
+    - raspberry-pi
+    - raspberry-pi2
+    - raspberrypi3
+    - raspberrypi4-64
+    - fincm3
+    - intel-nuc

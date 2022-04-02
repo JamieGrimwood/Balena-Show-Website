@@ -1,0 +1,49 @@
+ARG NODEJS_VERSION="16"
+
+FROM balenalib/%%BALENA_MACHINE_NAME%%-node:${NODEJS_VERSION}-run
+
+RUN install_packages \
+    curl \
+    libasound2 \
+    libdrm2 \
+    libgbm1 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnss3 \
+    libx11-xcb1 \
+    libxss1 \
+    libxtst6 \
+    libgles2-mesa \
+    libxshmfence1 \
+    mesa-utils \
+    mesa-utils-extra
+
+WORKDIR /opt
+
+# install node dependencies
+COPY ./package.json /opt/package.json
+RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force && rm -rf /root/.cache/*
+
+COPY ./src /opt/
+RUN chmod +x /opt/*.sh
+
+ENV UDEV=1
+
+# set time zone statically, because London will not be moving any time soon...
+ENV TZ=Europe/London
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Add electron user
+RUN useradd electron -m -s /bin/bash -G root || true && \
+    groupadd -r -f electron && id -u electron || true \
+    && chown -R electron:electron /home/electron || true
+
+# udev rule to set specific permissions 
+RUN echo 'SUBSYSTEM=="vchiq",GROUP="video",MODE="0660"' > /etc/udev/rules.d/10-vchiq-permissions.rules
+RUN usermod -a -G audio,video,tty,render electron
+
+CMD ["bash", "/opt/start.sh"]
+
+ENV NODE_ENV=production \
+    DISPLAY=:0
